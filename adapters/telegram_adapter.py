@@ -1,4 +1,4 @@
-from telegram import Update # pip install python-telegram-bot==20.7
+from telegram import Update # pip install python-telegram-bot
 from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters, CallbackContext
 from ports import BotMessagePort
 
