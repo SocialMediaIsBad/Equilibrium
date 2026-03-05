@@ -15,11 +15,6 @@ class TelegramInboundAdapter(InputMessagePort):
         chat_context = ChatContext(chat_id=update.message.chat_id)
         await self.receive_message(content, user, chat_context)
 
-    #def run(self, token: str):
-    #    app = ApplicationBuilder().token(token).build()
-    #    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.on_update))
-    #    app.run_polling()
-
     async def receive_message(self, content:str, user:str, chat_context:ChatContext):
         await self.receive_message_service(content=content, user=user, chat_context=chat_context)
 

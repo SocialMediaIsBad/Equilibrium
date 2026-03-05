@@ -24,4 +24,3 @@ receive_message_service = ReceiveMessageService(repository_port=db_adapter, send
 telegram_inbound_adapter = TelegramInboundAdapter(receive_message_service.receive_message, app)
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, telegram_inbound_adapter.on_update))
 app.run_polling()
-#telegram_inbound_adapter.run(TOKEN)
