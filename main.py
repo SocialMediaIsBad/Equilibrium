@@ -1,5 +1,7 @@
 import os
 from dotenv import load_dotenv
+from telegram.ext import ApplicationBuilder
+
 from application.use_cases.message_service import MessageService
 from adapters.telegram_adapters import TelegramOutboundAdapter, TelegramInboundAdapter
 from adapters.db_adapter import DbAdapter
@@ -11,5 +13,5 @@ if not TOKEN:
 
 db_adapter = DbAdapter()
 message_service = MessageService(repository_port=db_adapter)
-bot = TelegramOutboundAdapter(message_service)
+bot = TelegramInboundAdapter(message_service)
 bot.run(TOKEN)

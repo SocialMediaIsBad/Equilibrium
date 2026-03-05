@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+
+from torchvision import message
+
 from Domain.Message import Message
 from telegram import Update
 
@@ -11,7 +14,7 @@ class InputMessagePort(ABC):
 #Driving Ports
 class OutputMessagePort(ABC):
     @abstractmethod
-    def send_messages(self):
+    def send_messages(self, messages: list[Message]):
         pass
 
 class RepositoryPort(ABC):
