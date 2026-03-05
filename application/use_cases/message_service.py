@@ -3,7 +3,6 @@ from Domain.Message import Message
 
 class MessageService(InputMessagePort, OutputMessagePort):
     def __init__(self, repository_port: RepositoryPort):
-        self._messages: list[str] = []
         self.repository_port = repository_port
 
     def receive_message(self, content: str, user: str):
