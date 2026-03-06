@@ -6,9 +6,9 @@ from telegram.ext import ApplicationBuilder, MessageHandler, filters
 from application.use_cases.message_services import MessageService
 from adapters.telegram_adapters import TelegramOutboundAdapter, TelegramInboundAdapter
 from adapters.db_adapter import DbAdapter
+from config import Config
 
-load_dotenv()
-TOKEN = os.getenv('TELEGRAM_TOKEN')
+TOKEN = Config.TELEGRAM_TOKEN
 if not TOKEN:
     raise RuntimeError("Token not found")
 
