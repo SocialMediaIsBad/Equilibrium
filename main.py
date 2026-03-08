@@ -7,6 +7,8 @@ from adapters.db_adapter import DbAdapter
 from application.use_cases.photo_service import PhotoService
 from config import Config
 
+Config.validate()
+
 TOKEN = Config.TELEGRAM_TOKEN
 if not TOKEN:
     raise RuntimeError("Token not found")
