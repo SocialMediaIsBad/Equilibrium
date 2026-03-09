@@ -1,5 +1,3 @@
-from pyexpat.errors import messages
-
 from domain.chat_context import ChatContext
 from application.ports import OutputMessagePort, RepositoryPort
 from domain.photo import Photo
@@ -8,19 +6,19 @@ from domain.domain_services.price_extraction_service import PriceExtractionServi
 
 
 class PhotoService:
-    def __init__(self, repository_port: RepositoryPort, output_message_port: OutputMessagePort):
+    def __init__(self, repository_port: RepositoryPort, output_message_port: OutputMessagePort, price_extraction_service: PriceExtractionService):
         self.repository_port = repository_port
         self.output_message_port = output_message_port
+        self.price_extraction_service = price_extraction_service
 
     async def receive_photo(self, photo: bytearray, user: str, chat_context: ChatContext):
         bill = Photo(id=None, photo=photo, user=user)
         self.repository_port.save_photo(bill)
-        price_extraction_service = PriceExtractionService()
-        price = price_extraction_service.extract_price(bill.photo)
+        price = self.price_extraction_service.extract_price(bill.photo)
         if price:
             message = "You just payed " + str(price)
         else:
-            message = 'Somethin went wrong here'
+            message = 'Something went wrong here'
         await self.send_message(message, chat_context)
 
     async def send_message(self, message: str, chat_context: ChatContext):
