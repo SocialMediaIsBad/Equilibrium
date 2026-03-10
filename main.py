@@ -10,6 +10,7 @@ from adapters.repository_adapter import DbAdapter
 from application.use_cases.photo_service import PhotoService
 from config import Config
 from domain import message
+from domain.domain_services.balance_calculation_service import BalanceCalculationService
 from domain.domain_services.image_processing_service import ImageProcessingService
 from domain.domain_services.ocr_reading_service import OcrReadingService
 from domain.domain_services.price_extraction_service import PriceExtractionService
@@ -25,8 +26,9 @@ reader = easyocr.Reader([config.OCR_LANGUAGE])
 
 db_adapter = DbAdapter(config.IMAGE_PATH)
 telegram_outbound_adapter = TelegramOutboundAdapter(bot)
+balance_calculation_service = BalanceCalculationService(db_adapter)
 message_service = MessageService(repository_port=db_adapter, output_message_port=telegram_outbound_adapter)
-command_service = CommandService(output_message_port=telegram_outbound_adapter, message=message.Message)
+command_service = CommandService(output_message_port=telegram_outbound_adapter, balance_calculation_interface=balance_calculation_service, message=message.Message)
 ocr_reading_service = OcrReadingService(reader)
 image_processing_service = ImageProcessingService()
 text_analyzing_service = TextAnalyzingService(config)

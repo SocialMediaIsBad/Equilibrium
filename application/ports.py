@@ -45,5 +45,5 @@ class RepositoryPort(ABC):
         pass
 
     @abstractmethod
-    def get_balance(self, user_id: int) -> dict[str, float]:
+    def get_sums_of_deposits(self) -> list:
         pass
