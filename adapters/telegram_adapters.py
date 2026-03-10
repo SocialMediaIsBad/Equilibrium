@@ -14,7 +14,7 @@ class TelegramInboundAdapter(InputMessagePort):
 
     async def on_update(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.message.from_user.id
-        user_name = update.message.from_user.username
+        user_name = update.message.from_user.first_name
         chat_context = ChatContext(chat_id=update.message.chat_id)
 
         if update.message.photo:
