@@ -3,7 +3,7 @@ from domain.interfaces.text_analyzing_interface import TextAnalyzingInterface
 from rapidfuzz import fuzz
 
 class TextAnalyzingService(TextAnalyzingInterface):
-    def __init__(self, config: type[Config]):
+    def __init__(self, config: Config):
         self.config = config
 
     def overlap_satisfied(self, a, b):
@@ -16,7 +16,7 @@ class TextAnalyzingService(TextAnalyzingInterface):
         else:
             return False
 
-    def get_all_lines(self, text_matrix):
+    def get_all_lines(self, text_matrix) -> list[str]:
         lines = []
         current_line = "" + text_matrix[0][1]
 
@@ -35,7 +35,7 @@ class TextAnalyzingService(TextAnalyzingInterface):
 
         return lines
 
-    def get_relevant_lines(self, lines_of_document):
+    def get_relevant_lines(self, lines_of_document: list[str]) -> list[str]:
         keywords = self.config.KEYWORDS_FOR_PRICE_SEARCH.split(',')
         relevant_lines = []
 

@@ -1,6 +1,6 @@
 import re
 
-from typing import List, Optional
+from typing import Optional
 from collections import Counter
 
 from config import Config
@@ -13,13 +13,13 @@ from domain.interfaces.text_analyzing_interface import TextAnalyzingInterface
 class PriceExtractionService(PriceExtractionInterface):
     num_like = re.compile(r"[0-9OIlS,.]+")
 
-    def __init__(self, ocr_reader: OcrReadingInterface, image_processor: ImageProcessingInterface, text_analyzer: TextAnalyzingInterface, config: type[Config]):
+    def __init__(self, ocr_reader: OcrReadingInterface, image_processor: ImageProcessingInterface, text_analyzer: TextAnalyzingInterface, config: Config):
         self.reader = ocr_reader
         self.image_processor = image_processor
         self.text_analyzer = text_analyzer
         self. config = config
 
-    def extract_obvious_prices(self, line):
+    def extract_obvious_prices(self, line: str) -> list[float]:
         candidates = self.num_like.findall(line)
         prices = []
 
@@ -29,6 +29,17 @@ class PriceExtractionService(PriceExtractionInterface):
                 prices.append(float(norm))
 
         return prices
+
+    def extract_not_so_obvious_prices(self, line: str) -> list[float]:
+        candidates = self.num_like.findall(line)
+
+        for c in candidates:
+            norm = self.normalize_number_token(c)
+            if re.fullmatch(r"\d{1,4}\.\d{2}", norm):
+                line = re.sub(c, "", line)
+
+        line = self.normalize_number_token(line)
+        return self.extract_obvious_prices(line)
 
     def normalize_number_token(self, token: str) -> str:
         token = (token
@@ -48,25 +59,14 @@ class PriceExtractionService(PriceExtractionInterface):
 
         return token
 
-    def extract_not_so_obvious_prices(self, line):
-        candidates = self.num_like.findall(line)
-
-        for c in candidates:
-            norm = self.normalize_number_token(c)
-            if re.fullmatch(r"\d{1,4}\.\d{2}", norm):
-                line = re.sub(c, "", line)
-
-        line = self.normalize_number_token(line)
-        return self.extract_obvious_prices(line)
-
-    def extract_price_from_list(self, strings: List[str]) -> Optional[str]:
+    def extract_price_from_list(self, strings: list[str]) -> Optional[str]:
         if not strings:
             return None
 
         counter = Counter(strings)
         return counter.most_common(1)[0][0]
 
-    def extract_price_from_picture(self, picture):
+    def extract_price_from_picture(self, picture: bytes) -> Optional[str]:
         possible_payments = []
 
         text_matrix = self.reader.read_text(picture)
@@ -79,7 +79,7 @@ class PriceExtractionService(PriceExtractionInterface):
 
         return price
 
-    def extract_price(self, photo: bytearray) -> Optional[float]:
+    def coordinate_price_search(self, photo: bytearray) -> Optional[float]:
         photo = bytes(photo)
         price = self.extract_price_from_picture(photo)
         if price is None:

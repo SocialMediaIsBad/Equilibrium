@@ -3,5 +3,5 @@ from typing import Any
 
 class OcrReadingInterface(ABC):
     @abstractmethod
-    def read_text(self, photo: bytearray) -> list[dict[str, Any]]:
+    def read_text(self, photo: bytes) -> list[dict[str, Any]]:
         pass

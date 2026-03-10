@@ -14,11 +14,11 @@ class PhotoService:
     async def receive_photo(self, photo: bytearray, user: str, chat_context: ChatContext):
         bill = Photo(id=None, photo=photo, user=user)
         self.repository_port.save_photo(bill)
-        price = self.price_extraction_service.extract_price(bill.photo)
+        price = self.price_extraction_service.coordinate_price_search(bill.photo)
         if price:
             message = "You just payed " + str(price)
         else:
-            message = 'Something went wrong here'
+            message = 'Seems we could not find the total sum on the bill'
         await self.send_message(message, chat_context)
 
     async def send_message(self, message: str, chat_context: ChatContext):

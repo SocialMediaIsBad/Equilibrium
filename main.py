@@ -12,20 +12,21 @@ from domain.domain_services.ocr_reading_service import OcrReadingService
 from domain.domain_services.price_extraction_service import PriceExtractionService
 from domain.domain_services.text_analyzing_service import TextAnalyzingService
 
-Config.validate()
-TOKEN = Config.TELEGRAM_TOKEN
+config = Config()
+config.validate()
+TOKEN = config.TELEGRAM_TOKEN
 
 app = ApplicationBuilder().token(TOKEN).build()
 bot = Bot(token=TOKEN)
-reader = easyocr.Reader([Config.OCR_LANGUAGE])
+reader = easyocr.Reader([config.OCR_LANGUAGE])
 
 db_adapter = DbAdapter()
 telegram_outbound_adapter = TelegramOutboundAdapter(bot)
 message_service = MessageService(repository_port=db_adapter, output_message_port=telegram_outbound_adapter)
 ocr_reading_service = OcrReadingService(reader)
 image_processing_service = ImageProcessingService()
-text_analyzing_service = TextAnalyzingService(Config)
-price_extraction_service = PriceExtractionService(ocr_reading_service, image_processing_service, text_analyzing_service, config=Config)
+text_analyzing_service = TextAnalyzingService(config)
+price_extraction_service = PriceExtractionService(ocr_reading_service, image_processing_service, text_analyzing_service, config=config)
 photo_service = PhotoService(repository_port=db_adapter, output_message_port=telegram_outbound_adapter, price_extraction_service=price_extraction_service)
 telegram_inbound_adapter = TelegramInboundAdapter(message_service.receive_message, photo_service.receive_photo, application= app)
 
