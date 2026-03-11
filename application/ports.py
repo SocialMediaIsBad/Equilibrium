@@ -79,3 +79,7 @@ class RepositoryPort(ABC):
     @abstractmethod
     def get_sums_of_deposits(self) -> list:
         pass
+
+    @abstractmethod
+    def delete_payment(self, payment_id: int) -> bool:
+        pass
