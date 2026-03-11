@@ -24,8 +24,7 @@ class TelegramInboundAdapter(InputMessagePort):
             await self.receive_photo(photo_bytes, user_id, user_name, chat_context)
         elif update.message.text and update.message.text.startswith('/'):
             command_text = update.message.text
-            command_parts = command_text[1:].split()  # '/' entfernen und splitten
-            args = command_parts[1:] if len(command_parts) > 1 else []
+            command_parts = command_text[1:].split()
             command = Command(
                 content=command_parts[0],
                 user_id=user_id,
