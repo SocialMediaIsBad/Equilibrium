@@ -1,5 +1,6 @@
 import sqlite3
 import io
+import os
 from typing import Optional
 
 from PIL import Image
@@ -85,6 +86,7 @@ class DbAdapter(RepositoryPort):
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             image_path = f"{self.images_storage_path}user_{photo.user_id}_{timestamp}.png"
 
+            os.makedirs(self.images_storage_path, exist_ok=True)
             image.save(image_path)
             print(f"Image saved successfully: {image_path}")
             return image_path
