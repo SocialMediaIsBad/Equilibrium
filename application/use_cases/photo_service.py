@@ -12,6 +12,8 @@ class PhotoService(PhotoServicePort):
         self.price_extraction_service = price_extraction_service
 
     async def receive_photo(self, photo: bytearray, user_id: int, user_name: str, chat_context: ChatContext):
+        await self.send_message("Processing your image.",chat_context)
+
         bill = Photo(id=None, photo=photo, user_id=user_id, sum=None, user_name= user_name)
         price = self.price_extraction_service.coordinate_price_search(bill.photo)
         bill.sum = price
