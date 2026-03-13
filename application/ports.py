@@ -43,7 +43,7 @@ class CommandServicePort(ABC):
         pass
 
     @abstractmethod
-    def command_balance(self, balances: list) -> list[Message]:
+    def command_balance(self, balances: list, deposits: list) -> list[Message]:
         pass
 
 class MessageServicePort(ABC):

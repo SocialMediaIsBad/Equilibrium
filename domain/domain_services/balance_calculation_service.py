@@ -5,7 +5,7 @@ class BalanceCalculationService(BalanceCalculationInterface):
     def __init__(self, repository_port: RepositoryPort):
         self.repository_port = repository_port
 
-    def calculate_balance(self) -> list:
+    def calculate_balances(self) -> list:
         deposits = self.repository_port.get_sums_of_deposits()
         users_count = len(deposits)
         total_sum = 0
@@ -16,6 +16,10 @@ class BalanceCalculationService(BalanceCalculationInterface):
         average_sum = total_sum / users_count
 
         for deposit in deposits:
-            balances.append((deposit[0], deposit[1] - average_sum))
+            balances.append((deposit[0], round(deposit[1] - average_sum, 2)))
 
         return balances
+
+    def calculate_deposits(self) -> list:
+        deposits = self.repository_port.get_sums_of_deposits()
+        return deposits
