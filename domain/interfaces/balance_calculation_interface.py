@@ -2,5 +2,9 @@ from abc import ABC, abstractmethod
 
 class BalanceCalculationInterface(ABC):
     @abstractmethod
-    def calculate_balance(self) -> list:
+    def calculate_balances(self) -> list:
+        pass
+
+    @abstractmethod
+    def calculate_deposits(self) -> list:
         pass

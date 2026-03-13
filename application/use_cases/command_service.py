@@ -15,8 +15,9 @@ class CommandService(CommandServicePort):
         responses = list()
 
         if command.content == "balance":
-            balances = self.balance_calculation_interface.calculate_balance()
-            responses + self.command_balance(balances)
+            balances = self.balance_calculation_interface.calculate_balances()
+            deposits = self.balance_calculation_interface.calculate_deposits()
+            responses = responses + self.command_balance(balances, deposits)
 
         elif command.content == "start":
             responses.append(self.command_start())
@@ -76,12 +77,29 @@ class CommandService(CommandServicePort):
         )
         return response
 
-    def command_balance(self, balances: list) -> list[Message]:
+    def command_balance(self, balances: list, deposits: list) -> list[Message]:
         messages = list()
+
+        for deposit in deposits:
+            message = self.message(
+                message_id=None,
+                content=deposit[0] + " paid in total: " + str(deposit[1]) + "€",
+                user_id=None,
+                user_name=None
+            )
+            messages.append(message)
+
+        messages.append(self.message(
+            message_id=None,
+            content="",
+            user_id=None,
+            user_name=None
+        ))
+
         for balance in balances:
             message = self.message(
                 message_id=None,
-                content=balance[0] + ": " + str(balance[1]) + "€",
+                content=balance[0] + " has left to pay: " + str( -1 * balance[1]) + "€",
                 user_id=None,
                 user_name=None
             )
