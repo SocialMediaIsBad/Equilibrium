@@ -127,7 +127,7 @@ class DbAdapter(RepositoryPort):
             (payment_id,)
         )
 
-        error_message = error_message[0][0] + f" Payment deleted by User: {payment[0][0]}€"
+        error_message = error_message[0][0] + f" Payment deleted by User: {payment[0][0]}€\n"
 
         if payment[0][0] is None:
             print("No payment returned.")
@@ -152,15 +152,15 @@ class DbAdapter(RepositoryPort):
         command_parts = command.content.split()
 
         try:
-            amount = int(command_parts[1])
+            amount = float(command_parts[1])
         except ValueError as e:
             print(f"Value error: {e}")
             return None
 
         if len(command_parts) > 2:
-            comment = command_parts[2]
+            comment = " ".join(command_parts[2:]) + "\n"
         else:
-            comment = "No comment by User."
+            comment = "No comment by User.\n"
 
         payment_id = self._execute_query(
             "INSERT INTO Payments (User_id, Sum, Error) VALUES (?,?,?)",
@@ -169,3 +169,40 @@ class DbAdapter(RepositoryPort):
             return_last_row_id=True
         )
         return payment_id
+
+    def change_payment(self, command: Command) -> bool:
+        content_split = command.content.split()
+        payment_id = content_split[0][1:]
+        amount = content_split[1]
+
+        try:
+            amount = float(amount)
+        except ValueError as e:
+            print(f"Value error: {e}")
+            return False
+
+        if len(content_split) > 2:
+            comment = " ".join(content_split[2:]) + "\n"
+        else:
+            comment = "No comment by User.\n"
+            
+        error = self._execute_query("""
+            SELECT Error
+            FROM Payments
+            WHERE Payment_id = ?
+            """,
+                                    (payment_id,),
+            fetch=True, return_last_row_id=False)
+
+        if self._execute_query("""
+                        UPDATE Payments
+                        SET Sum = ?, Error = ?
+                        WHERE Payment_id = ?
+                        """,
+            (amount, error[0][0] + "Payment changed by user: " + comment, payment_id),
+            fetch=False,
+            return_last_row_id=False
+        ):
+            return True
+        else:
+            return False
