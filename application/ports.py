@@ -120,3 +120,7 @@ class RepositoryPort(ABC):
     @abstractmethod
     def add_payment(self, command: Command) -> int:
         pass
+
+    @abstractmethod
+    def change_payment(self, command: Command) -> bool:
+        pass

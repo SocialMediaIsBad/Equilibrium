@@ -19,7 +19,7 @@ class CommandService(CommandServicePort):
             "commands": [
                 {"command": "balance", "description": "Shows the current balance between all contributors."},
                 {"command": "ping", "description": "Pings the server."},
-                {"command": "add_payment", "description": "Adds a payment without a receipt."}
+                {"command": "add_payment", "description": "Hold command and add an amount and comment."}
             ]
         }
 
@@ -44,6 +44,9 @@ class CommandService(CommandServicePort):
 
         elif command.content.startswith("add_payment"):
             responses.append(self.command_add_payment(command))
+
+        elif command.content.startswith("C"):
+            responses.append(self.command_change_payment(command))
 
         else:
             responses.append(self.command_unknown())
@@ -124,14 +127,26 @@ class CommandService(CommandServicePort):
         return messages
 
     def command_add_payment(self, command: Command) -> Message:
-        amount = command.content.split()[1]
+        content_split = command.content.split()
+
+        if len(content_split) < 2:
+            message = self.message(
+                message_id=None,
+                user_id=None,
+                content=f"Amount required.",
+                user_name=None
+            )
+            return message
+
+        amount = content_split[1]
+
         payment_id = self.repository_port.add_payment(command)
 
         if payment_id:
             message = self.message(
                 message_id=None,
                 user_id=None,
-                content=f"Payment of {amount}€ added successfully.\nPress /X{payment_id} to delete.",
+                content=f"Payment of {amount}€ added successfully.\nPress /X{payment_id} to delete.\nHold /C{payment_id} to change the amount.",
                 user_name=None
             )
             return message
@@ -140,6 +155,37 @@ class CommandService(CommandServicePort):
                 message_id=None,
                 user_id=None,
                 content=f"Adding payment failed.\nSee logs for further information.",
+                user_name=None
+            )
+            return message
+
+    def command_change_payment(self, command: Command) -> Message:
+        content_split = command.content.split()
+
+        if len(content_split) < 2:
+            message = self.message(
+                message_id=None,
+                user_id=None,
+                content=f"Amount of payment missing",
+                user_name=None
+            )
+            return message
+
+        amount = content_split[1]
+        
+        if self.repository_port.change_payment(command):
+            message = self.message(
+                message_id=None,
+                user_id=None,
+                content=f"Payment changed to {amount}",
+                user_name=None
+            )
+            return message
+        else:
+            message = self.message(
+                message_id=None,
+                user_id=None,
+                content=f"Changing payment failed.\nSee logs for further information.",
                 user_name=None
             )
             return message
